@@ -1,0 +1,621 @@
+package org.naddeo.graphql;
+
+import java_cup.runtime.*;
+
+import org.naddeo.graphql.types.value.Value;
+import org.naddeo.graphql.types.value.BooleanValue;
+import org.naddeo.graphql.types.value.StringValue;
+import org.naddeo.graphql.types.value.IntegerValue;
+import org.naddeo.graphql.types.value.StringValue;
+import org.naddeo.graphql.types.value.VariableValue;
+
+import org.naddeo.graphql.types.Field;
+import org.naddeo.graphql.types.Fields;
+import org.naddeo.graphql.types.Argument;
+import org.naddeo.graphql.types.ArgumentList;
+import org.naddeo.graphql.types.value.ValueFactory;
+
+import org.naddeo.graphql.types.Directive;
+import org.naddeo.graphql.types.DirectiveList;
+
+import org.naddeo.graphql.types.Selection;
+import org.naddeo.graphql.types.SelectionSet;
+
+import org.naddeo.graphql.types.FragmentSpread;
+
+import org.naddeo.graphql.types.InlineFragment;
+
+import org.naddeo.graphql.types.VariableArgument;
+import org.naddeo.graphql.types.VariableArguments;
+
+import org.naddeo.graphql.types.OperationDefinition;
+
+import org.naddeo.graphql.types.FragmentDefinition;
+
+import org.naddeo.graphql.types.definition.DocumentDefinition;
+import org.naddeo.graphql.types.definition.DocumentDefinitionFactory;
+import org.naddeo.graphql.types.definition.DocumentDefinitions;
+
+action code {:
+
+    private final ValueFactory valueFactory = new ValueFactory();
+    private final DocumentDefinitionFactory documentDefinitionFactory = new DocumentDefinitionFactory();
+
+:};
+
+terminal                            COLON, L_PAREN, R_PAREN, EQUALS, L_BRACKET, R_BRACKET, DOLLAR, ON;
+terminal                            AT, ELLIPSES, FRAGMENT, TYPE, ENUM, UNION, INTERFACE, EXCLAMATION, BAR;
+terminal                            L_SQUARE_BRACKET, R_SQUARE_BRACKET;
+
+terminal                            DEBUG_FIELDS, DEBUG_ARGUMENTS, DEBUG_VALUE, DEBUG_DIRECTIVES, DEBUG_SELECTION_SET;
+terminal                            DEBUG_FRAGMENT_SPREAD, DEBUG_INLINE_FRAGMENT, DEBUG_VARIABLE_ARG, DEBUG_VARIABLE_DEFS;
+terminal                            DEBUG_OPERATION_DEF, DEBUG_FRAGMENT_DEF, DEBUG_DEFINITION, DEBUG_DOCUMENT;
+
+terminal String                     NAME, STRING_VALUE, OPERATION_TYPE;
+terminal Integer                    INT_VALUE;
+terminal Double                     FLOAT_VALUE;
+terminal Boolean                    BOOLEAN_VALUE;
+terminal String                     VARIABLE_VALUE;
+
+non terminal                        debug;
+non terminal Selection              selection;
+non terminal SelectionSet          selection_list, selection_set;
+non terminal Field                  field;
+non terminal Fields                 fields;
+non terminal Value                  value;
+non terminal ArgumentList           argument_list, arguments;
+non terminal Directive              directive;
+non terminal DirectiveList          directives;
+non terminal FragmentSpread         fragment_spread;
+non terminal InlineFragment         inline_fragment;
+non terminal VariableArgument       variable_arg;
+non terminal VariableArguments      variable_defs, variable_list;
+non terminal OperationDefinition    operation_def;
+non terminal FragmentDefinition     fragment_def;
+non terminal DocumentDefinition     definition;
+non terminal DocumentDefinitions    document;
+
+non terminal                        graphql;
+non terminal                        schema, schema_def;
+non terminal                        interface_def;
+non terminal                        type_def;
+non terminal                        type_fields;
+non terminal                        type_field;
+non terminal                        type_set;
+non terminal                        type_arguments;
+non terminal                        type_argument;
+non terminal                        type;
+non terminal                        enum_def;
+non terminal                        enum_entries;
+non terminal                        union_def;
+non terminal                        union_values;
+
+start with debug;
+
+graphql         ::= schema
+                   {:
+                   :}
+                   |
+                    document
+                   {:
+                   :}
+                   ;
+
+schema          ::= schema_def
+                   {:
+                   :}
+                   |
+                    schema_def schema
+                   {:
+                   :}
+                   ;
+
+schema_def      ::= type_def
+                   {:
+                   :}
+                   |
+                    interface_def
+                   {:
+                   :}
+                   |
+                    enum_def
+                   {:
+                   :}
+                   |
+                    union_def
+                   {:
+                   :}
+                   ;
+
+interface_def   ::= INTERFACE NAME:name type_set
+                   {:
+                   :}
+                   ;
+
+type_def        ::= TYPE NAME:name type_set
+                   {:
+                   :}
+                   |
+                    TYPE NAME:name COLON NAME:interfaceName type_set
+                   {:
+                   :}
+                   ;
+
+enum_def        ::= ENUM NAME:name L_BRACKET enum_entries R_BRACKET
+                   {:
+                   :}
+                   ;
+
+enum_entries    ::= NAME:name
+                   {:
+                   :}
+                   |
+                    NAME:name enum_entries:enumEntries
+                   {:
+                   :}
+                   ;
+
+union_def       ::= UNION NAME:name union_values
+                   {:
+                   :}
+                   ;
+
+union_values    ::= NAME:name
+                   {:
+                   :}
+                   |
+                    union_values:unionValues BAR NAME:name
+                   {:
+                   :}
+                   ;
+
+type_set        ::= L_BRACKET type_fields R_BRACKET
+                   {:
+                   :}
+                   ;
+
+type_fields     ::= type_field
+                   {:
+                   :}
+                   |
+                    type_field type_fields
+                   {:
+                   :}
+                   ;
+
+type_field      ::= NAME:name COLON type:type
+                   {:
+                   :}
+                   |
+                    NAME:name COLON type:type L_PAREN type_arguments R_PAREN
+                   {:
+                   :}
+                   ;
+
+type_arguments  ::= type_argument
+                   {:
+                   :}
+                   |
+                    type_argument type_arguments
+                   {:
+                   :}
+                   ;
+
+type_argument   ::= NAME:name COLON type:type
+                   {:
+                   :}
+                   ;
+
+type            ::= NAME
+                   {:
+                   :}
+                   |
+                    NAME EXCLAMATION
+                   {:
+                   :}
+                   |
+                    L_SQUARE_BRACKET NAME R_SQUARE_BRACKET
+                   {:
+                   :}
+                   |
+                    L_SQUARE_BRACKET NAME EXCLAMATION R_SQUARE_BRACKET
+                   {:
+                   :}
+                   ;
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+// TODO query section
+
+
+document        ::= definition:definition
+                   {:
+                    RESULT = DocumentDefinitions.builder().definition(definition).build();
+                   :}
+                   |
+                    definition:definition document:document
+                   {:
+                    RESULT = DocumentDefinitions.builder().definitions(document.getDefinitions()).definition(definition).build();
+                   :}
+                   ;
+
+definition      ::= operation_def:operationDef
+                   {:
+                    RESULT = documentDefinitionFactory.of(operationDef);
+                   :}
+                   |
+                    fragment_def:fragmentDef
+                   {:
+                    RESULT = documentDefinitionFactory.of(fragmentDef);
+                   :}
+                   ;
+
+fragment_def    ::= FRAGMENT NAME:name ON NAME:typeCondition selection_set:selectionSet
+                   {:
+                    RESULT = FragmentDefinition.builder().name(name).typeCondition(typeCondition).selectionSet(selectionSet).build();
+                   :}
+                   |
+                    FRAGMENT NAME:name ON NAME:typeCondition directives:directives selection_set:selectionSet
+                   {:
+                    RESULT = FragmentDefinition.builder().name(name).typeCondition(typeCondition).directives(directives).selectionSet(selectionSet).build();
+                   :}
+                   |
+                    FRAGMENT ON NAME:typeCondition selection_set:selectionSet
+                   {:
+                    RESULT = FragmentDefinition.builder().typeCondition(typeCondition).selectionSet(selectionSet).build();
+                   :}
+                   |
+                    FRAGMENT ON NAME:typeCondition directives:directives selection_set:selectionSet
+                   {:
+                    RESULT = FragmentDefinition.builder().typeCondition(typeCondition).directives(directives).selectionSet(selectionSet).build();
+                   :}
+                   ;
+
+operation_def   ::= selection_set:selectionSet
+                   {:
+                    RESULT = OperationDefinition.builder().selectionSet(selectionSet).build();
+                   :}
+                   |
+                    OPERATION_TYPE:operationType NAME:name selection_set:selectionSet
+                   {:
+                    RESULT = OperationDefinition.builder().operationType(operationType).name(name).selectionSet(selectionSet).build();
+                   :}
+                   |
+                    OPERATION_TYPE:operationType NAME:name variable_defs:variableDefs selection_set:selectionSet
+                   {:
+                    RESULT = OperationDefinition.builder().operationType(operationType).name(name).variableArguments(variableDefs).selectionSet(selectionSet).build();
+                   :}
+                   |
+                    OPERATION_TYPE:operationType NAME:name directives:directives selection_set:selectionSet
+                   {:
+                    RESULT = OperationDefinition.builder().operationType(operationType).name(name).directives(directives).selectionSet(selectionSet).build();
+                   :}
+                   |
+                    OPERATION_TYPE:operationType NAME:name variable_defs:variableDefs directives:directives selection_set:selectionSet
+                   {:
+                    RESULT = OperationDefinition.builder().operationType(operationType).name(name).variableArguments(variableDefs).directives(directives).selectionSet(selectionSet).build();
+                   :}
+                   ;
+
+variable_defs   ::= L_PAREN variable_list:variableList R_PAREN
+                   {:
+                    RESULT = variableList;
+                   :}
+                   ;
+
+variable_list   ::= variable_arg:variableArg
+                   {:
+                    RESULT = VariableArguments.builder().variableArgument(variableArg).build();
+                   :}
+                   |
+                    variable_arg:variableArg variable_list:variableArgs
+                   {:
+                    RESULT = VariableArguments.builder().variableArguments(variableArgs.getVariableArguments()).variableArgument(variableArg).build();
+                   :}
+                   ;
+
+variable_arg    ::= NAME:name COLON NAME:type
+                   {:
+                    RESULT = VariableArgument.builder().name(name).type(type).build();
+                   :}
+                   |
+                   NAME:name COLON NAME:type EQUALS value:defaultValue
+                   {:
+                    RESULT = VariableArgument.builder().name(name).type(type).defaultValue(defaultValue).build();
+                   :}
+                   ;
+
+fields          ::= field:field
+                   {:
+                    RESULT = Fields.builder().field(field).build();
+                   :}
+                   |
+                   field:field fields:fields
+                   {:
+                    RESULT = Fields.builder().fields(fields.getFields()).field(field).build();
+                   :}
+                   ;
+
+field           ::= NAME:field
+                   {:
+                    RESULT = Field.builder().name(field).build();
+                   :}
+                   |
+                   NAME:alias COLON NAME:field
+                   {:
+                    RESULT = Field.builder().name(field).alias(alias).build();
+                   :}
+                   |
+                   NAME:alias COLON NAME:field arguments:args
+                   {:
+                    RESULT = Field.builder().name(field).alias(alias).arguments(args).build();
+                   :}
+                   |
+                   NAME:field arguments:args
+                   {:
+                    RESULT = Field.builder().name(field).arguments(args).build();
+                   :}
+                   |
+                   NAME:field directives:directives
+                   {:
+                    RESULT = Field.builder().name(field).directives(directives).build();
+                   :}
+                   |
+                   NAME:alias COLON NAME:field directives:directives
+                   {:
+                    RESULT = Field.builder().name(field).alias(alias).directives(directives).build();
+                   :}
+                   |
+                   NAME:alias COLON NAME:field arguments:args directives:directives
+                   {:
+                    RESULT = Field.builder().name(field).alias(alias).arguments(args).directives(directives).build();
+                   :}
+                   |
+                   NAME:field arguments:args directives:directives
+                   {:
+                    RESULT = Field.builder().name(field).arguments(args).directives(directives).build();
+                   :}
+                   |
+                   NAME:field selection_set:selectionSet
+                   {:
+                    RESULT = Field.builder().name(field).selections(selectionSet).build();
+                   :}
+                   |
+                   NAME:alias COLON NAME:field selection_set:selectionSet
+                   {:
+                    RESULT = Field.builder().name(field).alias(alias).selections(selectionSet).build();
+                   :}
+                   |
+                   NAME:alias COLON NAME:field arguments:args selection_set:selectionSet
+                   {:
+                    RESULT = Field.builder().name(field).alias(alias).arguments(args).selections(selectionSet).build();
+                   :}
+                   |
+                   NAME:field arguments:args selection_set:selectionSet
+                   {:
+                    RESULT = Field.builder().name(field).arguments(args).selections(selectionSet).build();
+                   :}
+                   |
+                   NAME:field directives:directives selection_set:selectionSet
+                   {:
+                    RESULT = Field.builder().name(field).directives(directives).selections(selectionSet).build();
+                   :}
+                   |
+                   NAME:alias COLON NAME:field directives:directives selection_set:selectionSet
+                   {:
+                    RESULT = Field.builder().name(field).alias(alias).directives(directives).selections(selectionSet).build();
+                   :}
+                   |
+                   NAME:alias COLON NAME:field arguments:args directives:directives selection_set:selectionSet
+                   {:
+                    RESULT = Field.builder().name(field).alias(alias).arguments(args).directives(directives).selections(selectionSet).build();
+                   :}
+                   |
+                   NAME:field arguments:args directives:directives selection_set:selectionSet
+                   {:
+                    RESULT = Field.builder().name(field).arguments(args).directives(directives).selections(selectionSet).build();
+                   :}
+                   ;
+
+selection_set   ::= L_BRACKET selection_list:selections R_BRACKET
+                   {:
+                    RESULT = selections;
+                   :}
+                   ;
+
+selection_list  ::= selection:selection
+                   {:
+                    RESULT = SelectionSet.builder().selection(selection).build();
+                   :}
+                   |
+                    selection:selection selection_list:selections
+                   {:
+                    RESULT = SelectionSet.builder().selections(selections.getSelections()).selection(selection).build();
+                   :}
+                   ;
+
+selection       ::= field:field
+                   {:
+                    RESULT = Selection.builder().of(field).build();
+                   :}
+                   |
+                    fragment_spread:fragmentSpread
+                   {:
+                    RESULT = Selection.builder().of(fragmentSpread).build();
+                   :}
+                   |
+                    inline_fragment:inlineFragment
+                   {:
+                    RESULT = Selection.builder().of(inlineFragment).build();
+                   :}
+                   ;
+
+fragment_spread ::= ELLIPSES NAME:fragmentName directives:directives
+                   {:
+                    RESULT = FragmentSpread.builder().name(fragmentName).directives(DirectiveList.builder().directives(directives.getDirectives()).build()).build();
+                   :}
+                   ;
+
+inline_fragment ::= ELLIPSES ON NAME:typeName directives:directives selection_set:selections
+                   {:
+                    RESULT = InlineFragment.builder().typeName(typeName).directives(directives).selections(selections).build();
+                   :}
+                   |
+                    ELLIPSES ON NAME:typeName selection_set:selections
+                   {:
+                    RESULT = InlineFragment.builder().typeName(typeName).directives(DirectiveList.EMPTY_DIRECTIVE_LIST).selections(selections).build();
+                   :}
+                   ;
+
+directives      ::= directive:directive
+                   {:
+                    RESULT = DirectiveList.builder().directive(directive).build();
+                   :}
+                   |
+                    directives:directives directive:directive
+                   {:
+                    RESULT = DirectiveList.builder().directives(directives.getDirectives()).directive(directive).build();
+                   :}
+                   ;
+
+directive       ::= AT NAME:directiveName
+                   {:
+                    RESULT = Directive.builder().name(directiveName).build();
+                   :}
+                   |
+                    AT NAME:directiveName arguments:args
+                   {:
+                    RESULT = Directive.builder().name(directiveName).arguments(args).build();
+                   :}
+                   ;
+
+arguments       ::= L_PAREN argument_list:args R_PAREN
+                   {:
+                    RESULT = args;
+                   :}
+                   ;
+
+argument_list   ::= NAME:name COLON value:val
+                   {:
+                    RESULT = ArgumentList.builder().argument(Argument.builder().name(name).value(val).build()).build();
+                   :}
+                   |
+                   argument_list:arguments NAME:name COLON value:val
+                   {:
+                    RESULT = ArgumentList.builder().arguments(arguments.getArguments()).argument(Argument.builder().name(name).value(val).build()).build();
+                   :}
+                   ;
+
+value           ::= DOLLAR NAME:variable
+                   {:
+                    RESULT = valueFactory.ofVariable(variable);
+                   :}
+                   |
+                   INT_VALUE:intValue
+                   {:
+                    RESULT = valueFactory.of(intValue);
+                   :}
+                   |
+                   FLOAT_VALUE:floatValue
+                   {:
+                    RESULT = valueFactory.of(floatValue);
+                   :}
+                   |
+                   BOOLEAN_VALUE:booleanValue
+                   {:
+                    RESULT = valueFactory.of(booleanValue);
+                   :}
+                   |
+                   STRING_VALUE:stringValue
+                   {:
+                    RESULT = valueFactory.of(stringValue);
+                   :}
+                   ;
+
+/*
+* This rule is used for debugging.
+* It allows entry straight into rules besides the start rule, given
+* a special token.
+*/
+debug           ::= DEBUG_FIELDS fields:fields
+                   {:
+                    RESULT = fields;
+                   :}
+                   |
+                    DEBUG_ARGUMENTS arguments:arguments
+                   {:
+                    RESULT = arguments;
+                   :}
+                   |
+                    DEBUG_VALUE value:value
+                   {:
+                    RESULT = value;
+                   :}
+                   |
+                    DEBUG_DIRECTIVES directives:directives
+                   {:
+                    RESULT = directives;
+                   :}
+                   |
+                    DEBUG_SELECTION_SET selection_set:selections
+                   {:
+                    RESULT = selections;
+                   :}
+                   |
+                    DEBUG_FRAGMENT_SPREAD fragment_spread:fragment_spread
+                   {:
+                    RESULT = fragment_spread;
+                   :}
+                   |
+                    DEBUG_INLINE_FRAGMENT inline_fragment:inline_fragment
+                   {:
+                    RESULT = inline_fragment;
+                   :}
+                   |
+                    DEBUG_VARIABLE_ARG variable_arg:variableArg
+                   {:
+                    RESULT = variableArg;
+                   :}
+                   |
+                    DEBUG_VARIABLE_DEFS variable_defs:variableDefs
+                   {:
+                    RESULT = variableDefs;
+                   :}
+                   |
+                    DEBUG_OPERATION_DEF operation_def:operationDef
+                   {:
+                    RESULT = operationDef;
+                   :}
+                   |
+                    DEBUG_FRAGMENT_DEF fragment_def:fragmentDef
+                   {:
+                    RESULT = fragmentDef;
+                   :}
+                   |
+                    DEBUG_DEFINITION definition:definition
+                   {:
+                    RESULT = definition;
+                   :}
+                   |
+                    DEBUG_DOCUMENT document:document
+                   {:
+                    RESULT = document;
+                   :}
+                   |
+                    // The actual starting point
+                    document:document
+                   {:
+                    RESULT = document;
+                   :}
+                   ;

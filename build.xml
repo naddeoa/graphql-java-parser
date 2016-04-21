@@ -1,0 +1,98 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<project name="graphqllanguage" default="all">
+    <property name="cup" location="cup"/>
+    <property name="jflex" location="jflex"/>
+    <property name="java" location="src/"/>
+    <property name="generated_java" location="generated_src/"/>
+    <property name="classes" location="bin/classes" />
+    <property name="lib" location="lib"/>
+    <property name="test.dir" location="tst"/>
+    <property name="test.classes.dir" location="${classes}"/>
+    <property name="report.dir" location="report"/>
+    <property name="jar_file" location="bin/graphql-parser.jar"/>
+
+    <taskdef name="jflex" classname="jflex.anttask.JFlexTask" classpath="${lib}/jflex-1.6.1.jar"/>
+    <taskdef name="cup" classname="java_cup.anttask.CUPTask" classpath="${lib}/java-cup-11b.jar"/>
+
+    <target name="generate">
+        <cup srcfile="${cup}/Parser.cup" destdir="${generated_java}"
+             parser="GraphQLDocumentParser" interface="true" locations="false" nonterms="true" force="true"/>
+        <jflex file="${jflex}/Lexer.flex" destdir="${generated_java}"/>
+    </target>
+
+
+    <path id="libraries">
+        <files includes="${lib}/java-cup-11b-runtime.jar"/>
+        <files includes="${lib}/jflex-1.6.1.jar"/>
+        <files includes="${lib}/lombok.jar"/>
+        <files includes="${lib}/guava-18.0.jar"/>
+    </path>
+
+    <path id="test-libraries">
+        <files includes="${lib}/junit-4.12.jar"/>
+        <files includes="${lib}/hamcrest-core-1.3.jar"/>
+    </path>
+
+    <target name="compile">
+        <mkdir dir="${classes}" />
+        <javac destdir="${classes}">
+            <src path="${java}"/>
+            <src path="${generated_java}"/>
+            <classpath refid="libraries"/>
+        </javac>
+        <jar basedir="${classes}" destfile="${jar_file}">
+            <manifest>
+                <attribute name="Main-Class" value="org.naddeo.graphql.Main"/>
+                <attribute name="Class-Path" value="${lib}/java-cup-11b-runtime.jar ${lib}/guava-18.0.jar"/>
+            </manifest>
+        </jar>
+    </target>
+
+    <target name="all" depends="generate, compile"/>
+
+    <target name="clean">
+        <delete dir="${generated_java}"/>
+        <delete dir="${classes}"/>
+        <delete file="${jar_file}/"/>
+        <delete file="${report.dir}/"/>
+    </target>
+
+    <target name="run">
+        <java jar="${jar_file}" fork="true" failonerror="true"/>
+    </target>
+
+    <target name="debug">
+        <java jar="${jar_file}" fork="true" failonerror="true">
+            <jvmarg line="-Xdebug" />
+            <jvmarg line="-Xrunjdwp:transport=dt_socket,server=y,suspend=n,address=6633" />
+        </java>
+    </target>
+
+    <target name="junit" depends="all">
+        <mkdir dir="${report.dir}/raw" />
+        <junit printsummary="yes" haltonfailure="no">
+
+            <classpath refid="libraries" />
+            <classpath refid="test-libraries" />
+            <classpath location="${test.classes.dir}" />
+
+            <batchtest fork="yes" todir="${report.dir}/raw">
+                <formatter type="xml" />
+                <formatter type="plain" />
+                <fileset dir="${test.dir}">
+                    <include name="**/*Test.java" />
+                </fileset>
+            </batchtest>
+
+        </junit>
+    </target>
+
+    <target name="test" depends="junit">
+        <junitreport todir="${report.dir}">
+            <fileset dir="${report.dir}/raw/">
+                <include name="TEST-*.xml" />
+            </fileset>
+            <report format="noframes" todir="${report.dir}\html\" />
+        </junitreport>
+    </target>
+</project>
