@@ -1,8 +1,9 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<project name="graphqllanguage" default="all">
+<project name="graphqllanguage" default="release">
     <property name="cup" location="cup"/>
     <property name="jflex" location="jflex"/>
     <property name="java" location="src/"/>
+    <property name="test.src" location="tst/"/>
     <property name="generated_java" location="generated_src/"/>
     <property name="classes" location="bin/classes" />
     <property name="lib" location="lib"/>
@@ -48,13 +49,15 @@
         </jar>
     </target>
 
-    <target name="all" depends="generate, compile"/>
+    <target name="build" depends="generate, compile"/>
+    <target name="test" depends="junit, report"/>
+    <target name="release" depends="build, test-build, test"/>
 
     <target name="clean">
         <delete dir="${generated_java}"/>
         <delete dir="${classes}"/>
         <delete file="${jar_file}/"/>
-        <delete file="${report.dir}/"/>
+        <delete dir="${report.dir}/"/>
     </target>
 
     <target name="run">
@@ -68,15 +71,27 @@
         </java>
     </target>
 
-    <target name="junit" depends="all">
+    <target name="test-build">
+        <mkdir dir="${classes}" />
+        <javac destdir="${classes}">
+            <src path="${test.src}"/>
+            <classpath path="${classes}"/>
+            <classpath refid="libraries"/>
+            <classpath refid="test-libraries"/>
+        </javac>
+    </target>
+
+    <target name="junit">
         <mkdir dir="${report.dir}/raw" />
-        <junit printsummary="yes" haltonfailure="no">
+        <junit printsummary="yes" haltonfailure="no" failureproperty="test.result">
 
-            <classpath refid="libraries" />
-            <classpath refid="test-libraries" />
-            <classpath location="${test.classes.dir}" />
+            <classpath>
+                <path refid="libraries" />
+                <path refid="test-libraries" />
+                <pathelement location="${test.classes.dir}" />
+            </classpath>
 
-            <batchtest fork="yes" todir="${report.dir}/raw">
+            <batchtest fork="yes" todir="${report.dir}/raw" skipnontests="true">
                 <formatter type="xml" />
                 <formatter type="plain" />
                 <fileset dir="${test.dir}">
@@ -87,12 +102,13 @@
         </junit>
     </target>
 
-    <target name="test" depends="junit">
+    <target name="report">
         <junitreport todir="${report.dir}">
             <fileset dir="${report.dir}/raw/">
                 <include name="TEST-*.xml" />
             </fileset>
             <report format="noframes" todir="${report.dir}\html\" />
         </junitreport>
+        <fail message="Junit tests failed" if="test.result" />
     </target>
 </project>
