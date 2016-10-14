@@ -5,9 +5,6 @@ import lombok.Data;
 import lombok.NonNull;
 import org.naddeo.graphql.types.value.Value;
 
-/**
- * @author naddeo
- */
 @Data
 @Builder
 public class Argument {

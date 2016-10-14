@@ -31,6 +31,7 @@ import org.naddeo.graphql.types.VariableArguments;
 import org.naddeo.graphql.types.OperationDefinition;
 
 import org.naddeo.graphql.types.FragmentDefinition;
+import org.naddeo.graphql.types.ObjectType;
 
 import org.naddeo.graphql.types.definition.DocumentDefinition;
 import org.naddeo.graphql.types.definition.DocumentDefinitionFactory;
@@ -53,7 +54,7 @@ terminal                            L_SQUARE_BRACKET, R_SQUARE_BRACKET;
 terminal                            DEBUG_FIELDS, DEBUG_ARGUMENTS, DEBUG_VALUE, DEBUG_DIRECTIVES, DEBUG_SELECTION_SET;
 terminal                            DEBUG_FRAGMENT_SPREAD, DEBUG_INLINE_FRAGMENT, DEBUG_VARIABLE_ARG, DEBUG_VARIABLE_DEFS;
 terminal                            DEBUG_OPERATION_DEF, DEBUG_FRAGMENT_DEF, DEBUG_DEFINITION, DEBUG_DOCUMENT, DEBUG_SCHEMA;
-terminal                            DEBUG_ENUM_DEF;
+terminal                            DEBUG_ENUM_DEF, DEBUG_TYPE;
 
 terminal String                     NAME, STRING_VALUE, OPERATION_TYPE;
 terminal Integer                    INT_VALUE;
@@ -88,7 +89,7 @@ non terminal                        type_field;
 non terminal                        type_set;
 non terminal                        type_arguments;
 non terminal                        type_argument;
-non terminal                        type;
+non terminal ObjectType             type;
 non terminal EnumType               enum_def;
 non terminal EnumTypeEntries        enum_entries;
 non terminal                        union_def;
@@ -136,15 +137,6 @@ interface_def   ::= INTERFACE NAME:name type_set
                    :}
                    ;
 
-type_def        ::= TYPE NAME:name type_set
-                   {:
-                   :}
-                   |
-                    TYPE NAME:name COLON NAME:interfaceName type_set
-                   {:
-                   :}
-                   ;
-
 enum_def        ::= ENUM NAME:name L_BRACKET enum_entries:enumEntries R_BRACKET
                    {:
                     RESULT = EnumType.builder().name(name).entries(enumEntries).build();
@@ -172,6 +164,15 @@ union_values    ::= NAME:name
                    :}
                    |
                     union_values:unionValues BAR NAME:name
+                   {:
+                   :}
+                   ;
+
+type_def        ::= TYPE NAME:name type_set
+                   {:
+                   :}
+                   |
+                    TYPE NAME:name COLON NAME:interfaceName type_set
                    {:
                    :}
                    ;
@@ -213,20 +214,24 @@ type_argument   ::= NAME:name COLON type:type
                    :}
                    ;
 
-type            ::= NAME
+type            ::= NAME:name
                    {:
+                    RESULT = ObjectType.builder().name(name).list(false).nullable(true).build();
                    :}
                    |
-                    NAME EXCLAMATION
+                    NAME:name EXCLAMATION
                    {:
+                    RESULT = ObjectType.builder().name(name).list(false).nullable(false).build();
                    :}
                    |
-                    L_SQUARE_BRACKET NAME R_SQUARE_BRACKET
+                    L_SQUARE_BRACKET NAME:name R_SQUARE_BRACKET
                    {:
+                    RESULT = ObjectType.builder().name(name).list(true).nullable(true).build();
                    :}
                    |
-                    L_SQUARE_BRACKET NAME EXCLAMATION R_SQUARE_BRACKET
+                    L_SQUARE_BRACKET NAME:name R_SQUARE_BRACKET EXCLAMATION
                    {:
+                    RESULT = ObjectType.builder().name(name).list(true).nullable(false).build();
                    :}
                    ;
 
@@ -623,6 +628,11 @@ debug           ::= DEBUG_FIELDS fields:fields
                     DEBUG_ENUM_DEF enum_def:enumDef
                    {:
                     RESULT = enumDef;
+                   :}
+                   |
+                    DEBUG_TYPE type:type
+                   {:
+                    RESULT = type;
                    :}
                    |
                     // The actual starting point
