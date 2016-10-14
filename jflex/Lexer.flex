@@ -54,6 +54,8 @@ NAME            = [_A-Za-z][_0-9A-Za-z]*
     "**DBG_FRAGMENT_DEF"    { return symbol(sym.DEBUG_FRAGMENT_DEF); }
     "**DBG_DEFINITION"      { return symbol(sym.DEBUG_DEFINITION); }
     "**DBG_DOCUMENT"        { return symbol(sym.DEBUG_DOCUMENT); }
+    "**DBG_SCHEMA"          { return symbol(sym.DEBUG_SCHEMA); }
+    "**DEBUG_ENUM_DEF"      { return symbol(sym.DEBUG_ENUM_DEF); }
 
     "fragment"              { return symbol(sym.FRAGMENT); }
     "query"                 { return symbol(sym.OPERATION_TYPE); }
@@ -74,6 +76,7 @@ NAME            = [_A-Za-z][_0-9A-Za-z]*
     "on"                    { return symbol(sym.ON); }
     "true"                  { return symbol(sym.BOOLEAN_VALUE, Boolean.parseBoolean(yytext())); }
     "false"                 { return symbol(sym.BOOLEAN_VALUE, Boolean.parseBoolean(yytext())); }
+    "enum"                  { return symbol(sym.ENUM); }
 
     {NAME}                  { return symbol(sym.NAME); }
     {INT_VALUE}             { return symbol(sym.INT_VALUE, Integer.parseInt(yytext())); }

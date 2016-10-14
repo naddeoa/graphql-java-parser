@@ -69,6 +69,7 @@ public abstract class BaseGrammarTest {
             e.printStackTrace();
             Assert.fail(parseFailMessage(query));
         } catch (Exception e) {
+            e.printStackTrace();;
             Assert.fail(parseFailMessage(query));
         }
 

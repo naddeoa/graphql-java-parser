@@ -17,6 +17,7 @@ public enum ForcedStatement {
     FRAGMENT_DEFINITION("**DBG_FRAGMENT_DEF", "fragment_def"),
     DEFINITION("**DBG_DEFINITION", "definition"),
     DOCUMENT("**DBG_DOCUMENT", "document"),
+    ENUM_DEF("**DEBUG_ENUM_DEF", "enum_def")
     ;
 
     public final String token;
