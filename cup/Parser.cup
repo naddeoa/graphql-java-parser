@@ -34,6 +34,7 @@ import org.naddeo.graphql.types.FragmentDefinition;
 import org.naddeo.graphql.types.ObjectType;
 import org.naddeo.graphql.types.ObjectTypeArgument;
 import org.naddeo.graphql.types.ObjectTypeArgumentList;
+import org.naddeo.graphql.types.ObjectTypeField;
 
 import org.naddeo.graphql.types.definition.DocumentDefinition;
 import org.naddeo.graphql.types.definition.DocumentDefinitionFactory;
@@ -56,7 +57,7 @@ terminal                            L_SQUARE_BRACKET, R_SQUARE_BRACKET;
 terminal                            DEBUG_FIELDS, DEBUG_ARGUMENTS, DEBUG_VALUE, DEBUG_DIRECTIVES, DEBUG_SELECTION_SET;
 terminal                            DEBUG_FRAGMENT_SPREAD, DEBUG_INLINE_FRAGMENT, DEBUG_VARIABLE_ARG, DEBUG_VARIABLE_DEFS;
 terminal                            DEBUG_OPERATION_DEF, DEBUG_FRAGMENT_DEF, DEBUG_DEFINITION, DEBUG_DOCUMENT, DEBUG_SCHEMA;
-terminal                            DEBUG_ENUM_DEF, DEBUG_TYPE, DEBUG_TYPE_ARGUMENT, DEBUG_TYPE_ARGUMENTS;
+terminal                            DEBUG_ENUM_DEF, DEBUG_TYPE, DEBUG_TYPE_ARGUMENT, DEBUG_TYPE_ARGUMENTS, DEBUG_TYPE_FIELD;
 
 terminal String                     NAME, STRING_VALUE, OPERATION_TYPE;
 terminal Integer                    INT_VALUE;
@@ -87,7 +88,7 @@ non terminal                        schema, schema_def;
 non terminal                        interface_def;
 non terminal                        type_def;
 non terminal                        type_fields;
-non terminal                        type_field;
+non terminal ObjectTypeField        type_field;
 non terminal                        type_set;
 non terminal ObjectTypeArgumentList type_arguments;
 non terminal ObjectTypeArgument     type_argument;
@@ -195,10 +196,12 @@ type_fields     ::= type_field
 
 type_field      ::= NAME:name COLON type:type
                    {:
+                    RESULT = ObjectTypeField.builder().name(name).type(type).build();
                    :}
                    |
-                    NAME:name COLON type:type L_PAREN type_arguments R_PAREN
+                    NAME:name L_PAREN type_arguments:typeArguments R_PAREN COLON type:type
                    {:
+                    RESULT = ObjectTypeField.builder().name(name).type(type).arguments(typeArguments).build();
                    :}
                    ;
 
@@ -653,6 +656,11 @@ debug           ::= DEBUG_FIELDS fields:fields
                     DEBUG_TYPE_ARGUMENTS type_arguments:typeArguments
                    {:
                     RESULT = typeArguments;
+                   :}
+                   |
+                    DEBUG_TYPE_FIELD type_field:typeField
+                   {:
+                    RESULT = typeField;
                    :}
                    |
                     // The actual starting point

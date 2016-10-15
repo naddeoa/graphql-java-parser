@@ -21,6 +21,7 @@ public enum ForcedStatement {
     TYPE("**DEBUG_TYPE", "type"),
     TYPE_ARGUMENT("**DEBUG_TYPE_ARGUMENT", "type_argument"),
     TYPE_ARGUMENTS("**DEBUG_TYPE_ARGUMENTS", "type_arguments"),
+    TYPE_FIELD("**DEBUG_TYPE_FIELD", "type_field"),
     ;
 
     public final String token;
