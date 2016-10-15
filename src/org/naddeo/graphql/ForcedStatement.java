@@ -20,6 +20,7 @@ public enum ForcedStatement {
     ENUM_DEF("**DEBUG_ENUM_DEF", "enum_def"),
     TYPE("**DEBUG_TYPE", "type"),
     TYPE_ARGUMENT("**DEBUG_TYPE_ARGUMENT", "type_argument"),
+    TYPE_ARGUMENTS("**DEBUG_TYPE_ARGUMENTS", "type_arguments"),
     ;
 
     public final String token;
