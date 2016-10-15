@@ -57,6 +57,7 @@ NAME            = [_A-Za-z][_0-9A-Za-z]*
     "**DBG_SCHEMA"          { return symbol(sym.DEBUG_SCHEMA); }
     "**DEBUG_ENUM_DEF"      { return symbol(sym.DEBUG_ENUM_DEF); }
     "**DEBUG_TYPE"          { return symbol(sym.DEBUG_TYPE); }
+    "**DEBUG_TYPE_ARGUMENT" { return symbol(sym.DEBUG_TYPE_ARGUMENT); }
 
     "fragment"              { return symbol(sym.FRAGMENT); }
     "query"                 { return symbol(sym.OPERATION_TYPE); }

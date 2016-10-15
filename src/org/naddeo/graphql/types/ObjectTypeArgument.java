@@ -7,9 +7,9 @@ import lombok.experimental.Wither;
 @Value
 @Builder
 @Wither
-public class ObjectType
+public class ObjectTypeArgument
 {
     private final String name;
-    private final Boolean nullable;
-    private final Boolean list;
+    private final ObjectType type;
+    private final String defaultValue;
 }
