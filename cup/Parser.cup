@@ -42,11 +42,21 @@ import org.naddeo.graphql.types.definition.DocumentDefinitions;
 
 import org.naddeo.graphql.schema.EnumType;
 import org.naddeo.graphql.schema.EnumTypeEntries;
+import org.naddeo.graphql.GraphQLParserErrorHandler;
 
 action code {:
 
     private final ValueFactory valueFactory = new ValueFactory();
     private final DocumentDefinitionFactory documentDefinitionFactory = new DocumentDefinitionFactory();
+
+:};
+
+parser code {:
+
+    public void report_error(String message, Object info) {
+        GraphQLParserErrorHandler handler = new GraphQLParserErrorHandler();
+        handler.handle(this, this.stack, message, (Symbol)info);
+    }
 
 :};
 
