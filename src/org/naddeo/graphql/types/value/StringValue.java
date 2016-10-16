@@ -38,4 +38,10 @@ public class StringValue extends Value<String>{
                 .append("\"")
                 .toString();
     }
+
+    @Override
+    public String getDisplay()
+    {
+        return "\"" + value + "\"";
+    }
 }

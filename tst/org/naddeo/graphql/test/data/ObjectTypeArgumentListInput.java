@@ -3,6 +3,7 @@ package org.naddeo.graphql.test.data;
 import org.naddeo.graphql.types.ObjectType;
 import org.naddeo.graphql.types.ObjectTypeArgument;
 import org.naddeo.graphql.types.ObjectTypeArgumentList;
+import org.naddeo.graphql.types.value.ValueFactory;
 
 import lombok.Getter;
 import lombok.RequiredArgsConstructor;
@@ -11,12 +12,12 @@ import lombok.RequiredArgsConstructor;
 public enum ObjectTypeArgumentListInput implements TestData<ObjectTypeArgumentList>
 {
     HAPPY_PATH(TestObject.<ObjectTypeArgumentList>builder()
-            .parserInput("units: LengthUnit = METER, currency: CurrencyUnit!")
+            .parserInput("units: LengthUnit = \"METER\", currency: CurrencyUnit!")
             .expectedClass(ObjectTypeArgumentList.class)
             .pojoValue(ObjectTypeArgumentList.builder()
                     .argument(ObjectTypeArgument.builder()
                             .name("units")
-                            .defaultValue("METER")
+                            .defaultValue(new ValueFactory().of("METER"))
                             .type(ObjectType.builder()
                                     .name("LengthUnit")
                                     .list(false)

@@ -2,6 +2,8 @@ package org.naddeo.graphql.test.data;
 
 import org.naddeo.graphql.types.ObjectType;
 import org.naddeo.graphql.types.ObjectTypeArgument;
+import org.naddeo.graphql.types.value.ValueFactory;
+import org.naddeo.graphql.types.value.ValueFactoryTest;
 
 import lombok.Getter;
 import lombok.RequiredArgsConstructor;
@@ -10,7 +12,7 @@ import lombok.RequiredArgsConstructor;
 public enum ObjectTypeArgumentInput implements TestData<ObjectTypeArgument>
 {
     HAPPY_PATH(TestObject.<ObjectTypeArgument>builder()
-            .parserInput("name: SomeType = DefaultValue")
+            .parserInput("name: SomeType = \"DefaultValue\"")
             .expectedClass(ObjectTypeArgument.class)
             .pojoValue(ObjectTypeArgument.builder()
                     .name("name")
@@ -19,7 +21,7 @@ public enum ObjectTypeArgumentInput implements TestData<ObjectTypeArgument>
                             .nullable(true)
                             .list(false)
                             .build())
-                    .defaultValue("DefaultValue")
+                    .defaultValue(new ValueFactory().of("DefaultValue"))
                     .build())
             .build()),
 

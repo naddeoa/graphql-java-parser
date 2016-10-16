@@ -7,6 +7,7 @@ import org.naddeo.graphql.types.definition.DocumentDefinitions;
 import org.naddeo.graphql.types.value.BooleanValue;
 import org.naddeo.graphql.types.value.FloatValue;
 import org.naddeo.graphql.types.value.IntegerValue;
+import org.naddeo.graphql.types.value.ObjectValue;
 import org.naddeo.graphql.types.value.StringValue;
 import org.naddeo.graphql.types.value.Value;
 import org.naddeo.graphql.types.value.VariableValue;
@@ -37,6 +38,12 @@ public enum ValueInput implements TestData<Value> {
             .parserInput("$varName")
             .pojoValue(VALUE_FACTORY.ofVariable("varName"))
             .expectedClass(VariableValue.class)
+            .build()),
+
+    OBJECT_VALUE(TestObject.<Value>builder()
+            .parserInput("Object")
+            .pojoValue(VALUE_FACTORY.ofObject("Object"))
+            .expectedClass(ObjectValue.class)
             .build()),
 
     BOOLEAN_VALUE(TestObject.<Value>builder()

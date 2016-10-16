@@ -24,4 +24,8 @@ public class ValueFactory {
     public BooleanValue of(Boolean value){
         return new BooleanValue(value);
     }
+
+    public ObjectValue ofObject(String value){
+        return new ObjectValue(value);
+    }
 }

@@ -1,19 +1,19 @@
 package org.naddeo.graphql.types;
 
 import org.naddeo.graphql.GraphQLDisplayable;
+import org.naddeo.graphql.types.value.Value;
 
 import lombok.Builder;
-import lombok.Value;
 import lombok.experimental.Wither;
 
-@Value
+@lombok.Value
 @Builder
 @Wither
 public class ObjectTypeArgument implements GraphQLDisplayable
 {
     private final String name;
-    private final ObjectType type;
-    private final String defaultValue;
+    private final GraphQLType type;
+    private final Value<?> defaultValue;
 
     @Override
     public String getDisplay()
@@ -24,7 +24,7 @@ public class ObjectTypeArgument implements GraphQLDisplayable
 
         if(defaultValue != null){
             sb.append(" = ");
-            sb.append(defaultValue);
+            sb.append(defaultValue.getDisplay());
         }
 
         return sb.toString();

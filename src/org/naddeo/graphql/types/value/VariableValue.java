@@ -26,4 +26,9 @@ public class VariableValue extends Value<String>{
         return ValueType.VARIABLE;
     }
 
+    @Override
+    public String getDisplay()
+    {
+        return "$" + value;
+    }
 }

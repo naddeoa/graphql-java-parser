@@ -6,16 +6,17 @@ import lombok.NonNull;
 import lombok.RequiredArgsConstructor;
 
 /**
- * @author naddeo
+ * Value of a user defined type.
  */
 @EqualsAndHashCode(callSuper = false)
 @RequiredArgsConstructor(access = AccessLevel.PACKAGE)
-public class BooleanValue extends Value<Boolean>{
-
-    @NonNull private final Boolean value;
+public class ObjectValue extends Value<String>
+{
+    @NonNull
+    private final String value;
 
     @Override
-    public Boolean getValue()
+    public String getValue()
     {
         return value;
     }
@@ -23,12 +24,12 @@ public class BooleanValue extends Value<Boolean>{
     @Override
     public ValueType getType()
     {
-        return ValueType.BOOLEAN;
+        return ValueType.OBJECT;
     }
 
     @Override
     public String getDisplay()
     {
-        return value.toString();
+        return value;
     }
 }

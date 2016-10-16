@@ -35,6 +35,12 @@ import org.naddeo.graphql.types.ObjectType;
 import org.naddeo.graphql.types.ObjectTypeArgument;
 import org.naddeo.graphql.types.ObjectTypeArgumentList;
 import org.naddeo.graphql.types.ObjectTypeField;
+import org.naddeo.graphql.types.GraphQLType;
+import org.naddeo.graphql.types.scalars.BooleanType;
+import org.naddeo.graphql.types.scalars.IntType;
+import org.naddeo.graphql.types.scalars.FloatType;
+import org.naddeo.graphql.types.scalars.StringType;
+import org.naddeo.graphql.types.scalars.VariableType;
 
 import org.naddeo.graphql.types.definition.DocumentDefinition;
 import org.naddeo.graphql.types.definition.DocumentDefinitionFactory;
@@ -77,7 +83,7 @@ terminal String                     VARIABLE_VALUE;
 
 non terminal                        debug;
 non terminal Selection              selection;
-non terminal SelectionSet          selection_list, selection_set;
+non terminal SelectionSet           selection_list, selection_set;
 non terminal Field                  field;
 non terminal Fields                 fields;
 non terminal Value                  value;
@@ -102,7 +108,7 @@ non terminal ObjectTypeField        type_field;
 non terminal                        type_set;
 non terminal ObjectTypeArgumentList type_arguments;
 non terminal ObjectTypeArgument     type_argument;
-non terminal ObjectType             type;
+non terminal GraphQLType            type;
 non terminal EnumType               enum_def;
 non terminal EnumTypeEntries        enum_entries;
 non terminal                        union_def;
@@ -231,7 +237,7 @@ type_argument   ::= NAME:name COLON type:type
                     RESULT = ObjectTypeArgument.builder().name(name).type(type).build();
                    :}
                    |
-                    NAME:name COLON type:type EQUALS NAME:defaultValue
+                    NAME:name COLON type:type EQUALS value:defaultValue
                    {:
                     RESULT = ObjectTypeArgument.builder().name(name).type(type).defaultValue(defaultValue).build();
                    :}
@@ -261,17 +267,6 @@ type            ::= NAME:name
 
 
 
-
-
-
-
-
-
-
-
-
-
-// TODO query section
 
 
 document        ::= definition:definition
@@ -570,6 +565,11 @@ value           ::= DOLLAR NAME:variable
                    BOOLEAN_VALUE:booleanValue
                    {:
                     RESULT = valueFactory.of(booleanValue);
+                   :}
+                   |
+                   NAME:objectValue
+                   {:
+                    RESULT = valueFactory.ofObject(objectValue);
                    :}
                    |
                    STRING_VALUE:stringValue

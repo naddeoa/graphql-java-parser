@@ -25,4 +25,10 @@ public class IntegerValue extends Value<Integer> {
     {
         return ValueType.INTEGER;
     }
+
+    @Override
+    public String getDisplay()
+    {
+        return value.toString();
+    }
 }

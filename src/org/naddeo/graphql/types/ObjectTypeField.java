@@ -11,9 +11,9 @@ public class ObjectTypeField implements GraphQLDisplayable
 {
     private final String name;
     private final ObjectTypeArgumentList arguments;
-    private final ObjectType type;
+    private final GraphQLType type;
 
-    public ObjectTypeField(String name, ObjectTypeArgumentList arguments, ObjectType type)
+    public ObjectTypeField(String name, ObjectTypeArgumentList arguments, GraphQLType type)
     {
         this.name = name;
         this.arguments = arguments == null ? ObjectTypeArgumentList.EMPTY_ARGUMENT_LIST : arguments;

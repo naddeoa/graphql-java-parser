@@ -25,4 +25,10 @@ public class FloatValue extends Value<Double> {
     {
         return ValueType.FLOAT;
     }
+
+    @Override
+    public String getDisplay()
+    {
+        return value.toString();
+    }
 }
