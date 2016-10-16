@@ -24,8 +24,6 @@ public class ObjectTypeField implements GraphQLDisplayable
     public String getDisplay()
     {
         StringBuilder sb = new StringBuilder(name);
-        sb.append(": ");
-        sb.append(type.getDisplay());
 
         if (!arguments.getArguments().isEmpty()) {
             sb.append("(");
@@ -33,6 +31,8 @@ public class ObjectTypeField implements GraphQLDisplayable
             sb.append(")");
         }
 
+        sb.append(": ");
+        sb.append(type.getDisplay());
         return sb.toString();
     }
 }

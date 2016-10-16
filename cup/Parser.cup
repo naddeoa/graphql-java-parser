@@ -35,6 +35,7 @@ import org.naddeo.graphql.types.ObjectType;
 import org.naddeo.graphql.types.ObjectTypeArgument;
 import org.naddeo.graphql.types.ObjectTypeArgumentList;
 import org.naddeo.graphql.types.ObjectTypeField;
+import org.naddeo.graphql.types.ObjectTypeFieldList;
 import org.naddeo.graphql.types.GraphQLType;
 import org.naddeo.graphql.types.scalars.BooleanType;
 import org.naddeo.graphql.types.scalars.IntType;
@@ -74,6 +75,7 @@ terminal                            DEBUG_FIELDS, DEBUG_ARGUMENTS, DEBUG_VALUE, 
 terminal                            DEBUG_FRAGMENT_SPREAD, DEBUG_INLINE_FRAGMENT, DEBUG_VARIABLE_ARG, DEBUG_VARIABLE_DEFS;
 terminal                            DEBUG_OPERATION_DEF, DEBUG_FRAGMENT_DEF, DEBUG_DEFINITION, DEBUG_DOCUMENT, DEBUG_SCHEMA;
 terminal                            DEBUG_ENUM_DEF, DEBUG_TYPE, DEBUG_TYPE_ARGUMENT, DEBUG_TYPE_ARGUMENTS, DEBUG_TYPE_FIELD;
+terminal                            DEBUG_TYPE_FIELDS;
 
 terminal String                     NAME, STRING_VALUE, OPERATION_TYPE;
 terminal Integer                    INT_VALUE;
@@ -103,9 +105,8 @@ non terminal                        graphql;
 non terminal                        schema, schema_def;
 non terminal                        interface_def;
 non terminal                        type_def;
-non terminal                        type_fields;
+non terminal ObjectTypeFieldList    type_fields;
 non terminal ObjectTypeField        type_field;
-non terminal                        type_set;
 non terminal ObjectTypeArgumentList type_arguments;
 non terminal ObjectTypeArgument     type_argument;
 non terminal GraphQLType            type;
@@ -151,7 +152,7 @@ schema_def      ::= type_def
                    :}
                    ;
 
-interface_def   ::= INTERFACE NAME:name type_set
+interface_def   ::= INTERFACE NAME:name type_fields
                    {:
                    :}
                    ;
@@ -187,26 +188,23 @@ union_values    ::= NAME:name
                    :}
                    ;
 
-type_def        ::= TYPE NAME:name type_set
+type_def        ::= TYPE NAME:name L_BRACKET type_fields R_BRACKET
                    {:
                    :}
                    |
-                    TYPE NAME:name COLON NAME:interfaceName type_set
+                    TYPE NAME:name COLON NAME:interfaceName L_BRACKET type_fields R_BRACKET
                    {:
                    :}
                    ;
 
-type_set        ::= L_BRACKET type_fields R_BRACKET
+type_fields     ::= type_field:typeField
                    {:
-                   :}
-                   ;
-
-type_fields     ::= type_field
-                   {:
+                    RESULT = ObjectTypeFieldList.builder().typeField(typeField).build();
                    :}
                    |
-                    type_field type_fields
+                    type_field:typeField type_fields:typeFields
                    {:
+                    RESULT = ObjectTypeFieldList.builder().typeFields(typeFields.getTypeFields()).typeField(typeField).build();
                    :}
                    ;
 
@@ -671,6 +669,11 @@ debug           ::= DEBUG_FIELDS fields:fields
                     DEBUG_TYPE_FIELD type_field:typeField
                    {:
                     RESULT = typeField;
+                   :}
+                   |
+                    DEBUG_TYPE_FIELDS type_fields:typeFields
+                   {:
+                    RESULT = typeFields;
                    :}
                    |
                     // The actual starting point

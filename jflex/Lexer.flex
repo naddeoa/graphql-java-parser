@@ -60,6 +60,7 @@ NAME            = [_A-Za-z][_0-9A-Za-z]*
     "**DEBUG_TYPE_ARGUMENT"         { return symbol(sym.DEBUG_TYPE_ARGUMENT); }
     "**DEBUG_TYPE_ARGUMENTS"        { return symbol(sym.DEBUG_TYPE_ARGUMENTS); }
     "**DEBUG_TYPE_FIELD"            { return symbol(sym.DEBUG_TYPE_FIELD); }
+    "**DEBUG_TYPE_FIELDS"           { return symbol(sym.DEBUG_TYPE_FIELDS); }
 
     "fragment"                      { return symbol(sym.FRAGMENT); }
     "query"                         { return symbol(sym.OPERATION_TYPE); }
