@@ -17,6 +17,8 @@ import static java.util.stream.Collectors.joining;
 @Builder
 public class ObjectTypeFieldList implements GraphQLDisplayable
 {
+    public static final ObjectTypeFieldList EMPTY_FIELD_LIST = new ObjectTypeFieldList(null);
+
     @Singular
     private final ImmutableSet<ObjectTypeField> typeFields;
 

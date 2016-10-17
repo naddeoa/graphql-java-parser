@@ -32,6 +32,7 @@ import org.naddeo.graphql.types.OperationDefinition;
 
 import org.naddeo.graphql.types.FragmentDefinition;
 import org.naddeo.graphql.types.ObjectType;
+import org.naddeo.graphql.types.ObjectTypeDefinition;
 import org.naddeo.graphql.types.ObjectTypeArgument;
 import org.naddeo.graphql.types.ObjectTypeArgumentList;
 import org.naddeo.graphql.types.ObjectTypeField;
@@ -67,7 +68,7 @@ parser code {:
 
 :};
 
-terminal                            COLON, L_PAREN, R_PAREN, EQUALS, L_BRACKET, R_BRACKET, DOLLAR, ON;
+terminal                            COLON, L_PAREN, R_PAREN, EQUALS, L_BRACKET, R_BRACKET, DOLLAR, ON, IMPLEMENTS;
 terminal                            AT, ELLIPSES, FRAGMENT, TYPE, ENUM, UNION, INTERFACE, EXCLAMATION, BAR;
 terminal                            L_SQUARE_BRACKET, R_SQUARE_BRACKET;
 
@@ -75,7 +76,7 @@ terminal                            DEBUG_FIELDS, DEBUG_ARGUMENTS, DEBUG_VALUE, 
 terminal                            DEBUG_FRAGMENT_SPREAD, DEBUG_INLINE_FRAGMENT, DEBUG_VARIABLE_ARG, DEBUG_VARIABLE_DEFS;
 terminal                            DEBUG_OPERATION_DEF, DEBUG_FRAGMENT_DEF, DEBUG_DEFINITION, DEBUG_DOCUMENT, DEBUG_SCHEMA;
 terminal                            DEBUG_ENUM_DEF, DEBUG_TYPE, DEBUG_TYPE_ARGUMENT, DEBUG_TYPE_ARGUMENTS, DEBUG_TYPE_FIELD;
-terminal                            DEBUG_TYPE_FIELDS;
+terminal                            DEBUG_TYPE_FIELDS, DEBUG_TYPE_DEF;
 
 terminal String                     NAME, STRING_VALUE, OPERATION_TYPE;
 terminal Integer                    INT_VALUE;
@@ -104,7 +105,7 @@ non terminal DocumentDefinitions    document;
 non terminal                        graphql;
 non terminal                        schema, schema_def;
 non terminal                        interface_def;
-non terminal                        type_def;
+non terminal ObjectTypeDefinition   type_def;
 non terminal ObjectTypeFieldList    type_fields;
 non terminal ObjectTypeField        type_field;
 non terminal ObjectTypeArgumentList type_arguments;
@@ -188,12 +189,14 @@ union_values    ::= NAME:name
                    :}
                    ;
 
-type_def        ::= TYPE NAME:name L_BRACKET type_fields R_BRACKET
+type_def        ::= TYPE NAME:name L_BRACKET type_fields:typeFields R_BRACKET
                    {:
+                    RESULT = ObjectTypeDefinition.builder().name(name).objectTypeFieldList(typeFields).build();
                    :}
                    |
-                    TYPE NAME:name COLON NAME:interfaceName L_BRACKET type_fields R_BRACKET
+                    TYPE NAME:name IMPLEMENTS NAME:interfaceName L_BRACKET type_fields:typeFields R_BRACKET
                    {:
+                    RESULT = ObjectTypeDefinition.builder().name(name).implementedInterface(interfaceName).objectTypeFieldList(typeFields).build();
                    :}
                    ;
 
@@ -674,6 +677,11 @@ debug           ::= DEBUG_FIELDS fields:fields
                     DEBUG_TYPE_FIELDS type_fields:typeFields
                    {:
                     RESULT = typeFields;
+                   :}
+                   |
+                    DEBUG_TYPE_DEF type_def:typeDef
+                   {:
+                    RESULT = typeDef;
                    :}
                    |
                     // The actual starting point
