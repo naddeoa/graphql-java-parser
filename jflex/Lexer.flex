@@ -63,11 +63,13 @@ NAME            = [_A-Za-z][_0-9A-Za-z]*
     "**DEBUG_TYPE_FIELDS"           { return symbol(sym.DEBUG_TYPE_FIELDS); }
     "**DEBUG_TYPE_DEF"              { return symbol(sym.DEBUG_TYPE_DEF); }
     "**DEBUG_UNION_VALUES"          { return symbol(sym.DEBUG_UNION_VALUES);}
+    "**DEBUG_UNION_DEF"             { return symbol(sym.DEBUG_UNION_DEF);}
 
     "fragment"                      { return symbol(sym.FRAGMENT); }
     "query"                         { return symbol(sym.OPERATION_TYPE); }
     "mutation"                      { return symbol(sym.OPERATION_TYPE); }
     "implements"                    { return symbol(sym.IMPLEMENTS); }
+    "union"                         { return symbol(sym.UNION); }
     ":"                             { return symbol(sym.COLON); }
     "|"                             { return symbol(sym.BAR); }
     "!"                             { return symbol(sym.EXCLAMATION); }

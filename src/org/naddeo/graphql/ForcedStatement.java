@@ -25,6 +25,7 @@ public enum ForcedStatement {
     TYPE_FIELDS("**DEBUG_TYPE_FIELDS", "type_fields"),
     TYPE_DEF("**DEBUG_TYPE_DEF", "type_def"),
     UNION_VALUES("**DEBUG_UNION_VALUES", "union_values"),
+    UNION_DEF("**DEBUG_UNION_DEF", "union_def"),
     ;
 
     public final String token;

@@ -38,6 +38,7 @@ import org.naddeo.graphql.types.ObjectTypeArgumentList;
 import org.naddeo.graphql.types.ObjectTypeField;
 import org.naddeo.graphql.types.ObjectTypeFieldList;
 import org.naddeo.graphql.types.UnionValues;
+import org.naddeo.graphql.types.UnionTypeDefinition;
 import org.naddeo.graphql.types.GraphQLType;
 import org.naddeo.graphql.types.scalars.BooleanType;
 import org.naddeo.graphql.types.scalars.IntType;
@@ -77,7 +78,7 @@ terminal                            DEBUG_FIELDS, DEBUG_ARGUMENTS, DEBUG_VALUE, 
 terminal                            DEBUG_FRAGMENT_SPREAD, DEBUG_INLINE_FRAGMENT, DEBUG_VARIABLE_ARG, DEBUG_VARIABLE_DEFS;
 terminal                            DEBUG_OPERATION_DEF, DEBUG_FRAGMENT_DEF, DEBUG_DEFINITION, DEBUG_DOCUMENT, DEBUG_SCHEMA;
 terminal                            DEBUG_ENUM_DEF, DEBUG_TYPE, DEBUG_TYPE_ARGUMENT, DEBUG_TYPE_ARGUMENTS, DEBUG_TYPE_FIELD;
-terminal                            DEBUG_TYPE_FIELDS, DEBUG_TYPE_DEF, DEBUG_UNION_VALUES;
+terminal                            DEBUG_TYPE_FIELDS, DEBUG_TYPE_DEF, DEBUG_UNION_VALUES, DEBUG_UNION_DEF;
 
 terminal String                     NAME, STRING_VALUE, OPERATION_TYPE;
 terminal Integer                    INT_VALUE;
@@ -114,7 +115,7 @@ non terminal ObjectTypeArgument     type_argument;
 non terminal GraphQLType            type;
 non terminal EnumType               enum_def;
 non terminal EnumTypeEntries        enum_entries;
-non terminal                        union_def;
+non terminal UnionTypeDefinition    union_def;
 non terminal UnionValues            union_values;
 
 start with debug;
@@ -176,8 +177,9 @@ enum_entries    ::= NAME:name
                    :}
                    ;
 
-union_def       ::= UNION NAME:name union_values:unionValues
+union_def       ::= UNION NAME:name EQUALS union_values:unionValues
                    {:
+                    RESULT = UnionTypeDefinition.builder().name(name).values(unionValues).build();
                    :}
                    ;
 
@@ -690,6 +692,11 @@ debug           ::= DEBUG_FIELDS fields:fields
                     DEBUG_UNION_VALUES union_values:unionValues
                    {:
                     RESULT = unionValues;
+                   :}
+                   |
+                    DEBUG_UNION_DEF union_def:unionDef
+                   {:
+                    RESULT = unionDef;
                    :}
                    |
                     // The actual starting point
